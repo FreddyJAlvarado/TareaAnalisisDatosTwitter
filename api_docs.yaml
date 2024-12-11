@@ -1,0 +1,109 @@
+openapi: 3.0.0
+info:
+  title: Twitter API - /2/tweets/search/recent
+  description: |
+    Documentación para el endpoint `/2/tweets/search/recent` para buscar tweets recientes.
+  version: 1.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/EliathVelasco/X-API-EPN/1.0.0
+  - url: https://api.twitter.com
+paths:
+  /2/tweets/search/recent:
+    get:
+      summary: Buscar tweets recientes
+      description: |
+        Obtiene los tweets más recientes que coinciden con la consulta de búsqueda. Se pueden especificar parámetros adicionales para filtrar y personalizar los resultados.
+      operationId: buscarTweetsRecientes
+      parameters:
+        - name: query
+          in: query
+          description: Parámetro de consulta de búsqueda. 
+          required: true
+          schema:
+            type: string
+        - name: max_results
+          in: query
+          description: El número máximo de resultados a devolver. Por defecto es 10. El máximo es 100.
+          required: false
+          schema:
+            type: integer
+            minimum: 10
+            maximum: 100
+        - name: tweet.fields
+          in: query
+          description: |
+            Una lista separada por comas de campos a incluir en los objetos Tweet. Ejemplo: `created_at,author_id`.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Respuesta exitosa que contiene los tweets.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: El identificador único del Tweet.
+                        text:
+                          type: string
+                          description: El texto del Tweet.
+                  meta:
+                    type: object
+                    properties:
+                      newest_id:
+                        type: string
+                        description: El ID del Tweet más reciente devuelto.
+                      oldest_id:
+                        type: string
+                        description: El ID del Tweet más antiguo devuelto.
+                      result_count:
+                        type: integer
+                        description: El número de resultados devueltos en la respuesta.
+              example: |
+                {
+                  "request": "GET /2/tweets/search/recent?query=%23OpenAI&max_results=5&tweet.fields=created_at,author_id",
+                  "response": {
+                    "data": [
+                      {
+                        "id": "1234567890123456789",
+                        "text": "¿Por qué sube el precio de todo? :/ #ecuador",
+                        "created_at": "2024-12-10T10:00:00.000Z",
+                        "author_id": "9876543210"
+                      },
+                      {
+                        "id": "1234567890123456790",
+                        "text": "Ya no soporto los cortes de luz #ecuador",
+                        "created_at": "2024-12-09T15:30:00.000Z",
+                        "author_id": "1234567890"
+                      }
+                    ],
+                    "meta": {
+                      "newest_id": "1234567890123456789",
+                      "oldest_id": "1234567890123456790",
+                      "result_count": 2
+                    }
+                  }
+                }
+        '401':
+          description: No autorizado. Falta el token Bearer o es inválido.
+        '403':
+          description: Prohibido. El usuario no tiene acceso al recurso solicitado.
+        '404':
+          description: No encontrado. El recurso solicitado no pudo ser encontrado.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+security:
+  - bearerAuth: []
